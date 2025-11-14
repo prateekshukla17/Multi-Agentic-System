@@ -47,13 +47,13 @@ export class AgentOrchestrtor {
 
       const outputCheck = await this.guardRails.checkOutput(response || '');
       if (!outputCheck.passed) {
-        console.log(`\nAssistant: ${outputCheck.message}\n`);
+        console.log(`\nassistant: ${outputCheck.message}\n`);
       } else {
-        console.log(`\nAssistant: ${response}\n`);
+        console.log(`\nassistant: ${response}\n`);
       }
     } catch (error) {
-      const msg = error instanceof Error ? error.message : 'Unknown error';
-      console.error('\nError:', msg);
+      const msg = error instanceof Error ? error.message : ' error';
+      console.error('\nrrror:', msg);
     }
 
     this.promptUser();
