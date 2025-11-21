@@ -4,7 +4,7 @@ import { OpenAIProvider } from './openai.provider';
 
 @Injectable()
 export class ITAgentService {
-  private itAgent: Agent;
+  public itAgent: Agent;
 
   constructor(private openai: OpenAIProvider) {
     this.initializeAgent();
