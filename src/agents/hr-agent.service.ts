@@ -1,16 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { Agent, run, tool } from '@openai/agents';
-import { ITAgentService } from './it-agent.service';
 import { ToolsService } from '../tools/tools.service';
 
 @Injectable()
 export class HRAgentService {
   public hrAgent: Agent;
 
-  constructor(
-    private itagent: ITAgentService,
-    private toolsService: ToolsService,
-  ) {
+  constructor(private toolsService: ToolsService) {
     this.initalisizeAgent();
   }
 
@@ -29,8 +25,7 @@ export class HRAgentService {
 Guidelines:
 - Keep responses concise and friendly
 - For leave-related questions (vacation, sick leave, time off, parental leave, etc.), ALWAYS use the queryLeavePolicies tool to get accurate information from the company's leave policies database
-- If you don't know something and there's no tool available, admit it.
-- For IT-related queries (technical issues, laptop problems, software, passwords), respond with: "[TRANSFER_TO_IT]" followed by a brief explanation of why the user should contact IT support.`,
+- If you don't know something and there's no tool available, admit it.`,
       tools: [
         tool({
           name: tools.queryLeavePolicies.function.name,
@@ -46,15 +41,6 @@ Guidelines:
     try {
       const result = await run(this.hrAgent, userMessage);
       const output = result.finalOutput || '';
-
-      if (output.includes('[TRANSFER_TO_IT]')) {
-        const itResponse = await this.itagent.handleTransfer(
-          userMessage,
-          'HR Agent transfer - IT-related query',
-        );
-        return itResponse;
-      }
-
       return output;
     } catch (error) {
       console.error('Error in HR agent:', error);

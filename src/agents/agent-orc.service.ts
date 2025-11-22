@@ -44,7 +44,7 @@ export class AgentOrchestrtor {
         return;
       }
 
-      const response = await this.hrAgent.processMessage(input);
+      const response = await this.orchestratorAgent.processOrcMessage(input);
 
       const outputCheck = await this.guardRails.checkOutput(response || '');
       if (!outputCheck.passed) {
