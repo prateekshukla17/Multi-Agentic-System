@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import * as readline from 'readline';
 import { HRAgentService } from './hr-agent.service';
 import { GuardrailsService } from 'src/guardrails/guardrails.service';
-
+import { OrchestratorService } from './orchestrator-agent.service';
 @Injectable()
 export class AgentOrchestrtor {
   private rl: readline.Interface;
@@ -10,6 +10,7 @@ export class AgentOrchestrtor {
   constructor(
     private hrAgent: HRAgentService,
     private guardRails: GuardrailsService,
+    private orchestratorAgent: OrchestratorService,
   ) {
     this.rl = readline.createInterface({
       input: process.stdin,
