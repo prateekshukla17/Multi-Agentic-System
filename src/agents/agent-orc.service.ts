@@ -1,15 +1,16 @@
 import { Injectable } from '@nestjs/common';
 import * as readline from 'readline';
-import { HRAgentService } from './hr-agent.service';
-import { GuardrailsService } from 'src/guardrails/guardrails.service';
+//import { GuardrailsService } from 'src/guardrails/guardrails.service';
 import { OrchestratorService } from './orchestrator-agent.service';
+import { InputGuardrailTripwireTriggered } from '@openai/agents';
+import { sDKGuardrail } from 'src/guardrails/sdk-guardrails.service';
+import { success } from 'zod/v4';
 @Injectable()
 export class AgentOrchestrtor {
   private rl: readline.Interface;
 
   constructor(
-    private hrAgent: HRAgentService,
-    private guardRails: GuardrailsService,
+    // private guardRails: GuardrailsService,
     private orchestratorAgent: OrchestratorService,
   ) {
     this.rl = readline.createInterface({
@@ -37,24 +38,31 @@ export class AgentOrchestrtor {
 
     try {
       //guardrail check
-      const inputCheck = await this.guardRails.checkInput(input);
-      if (!inputCheck.passed) {
-        console.log(`\nAssistant: ${inputCheck.message}\n`);
-        this.promptUser();
-        return;
-      }
+      // const inputCheck = await this.guardRails.checkInput(input);
+      // if (!inputCheck.passed) {
+      //   console.log(`\nAssistant: ${inputCheck.message}\n`);
+      //   this.promptUser();
+      //   return;
+      // }
 
       const response = await this.orchestratorAgent.processOrcMessage(input);
 
-      const outputCheck = await this.guardRails.checkOutput(response || '');
-      if (!outputCheck.passed) {
-        console.log(`\nassistant: ${outputCheck.message}\n`);
-      } else {
-        console.log(`\nassistant: ${response}\n`);
-      }
+      // const outputCheck = await this.guardRails.checkOutput(response || '');
+      // if (!outputCheck.passed) {
+      //   console.log(`\nassistant: ${outputCheck.message}\n`);
+      // } else {
+      //   console.log(`\nassistant: ${response}\n`);
+      // }
     } catch (error) {
-      const msg = error instanceof Error ? error.message : ' error';
-      console.error('\nrrror:', msg);
+      if (error instanceof InputGuardrailTripwireTriggered) {
+        const guardRailInfo = error.result.output.outputInfo;
+        return {
+          success: false,
+          message: 'Im sorry cant help you with that',
+          details: guardRailInfo.reasoning,
+          type: `Blocked Guardrail`,
+        };
+      }
     }
 
     this.promptUser();

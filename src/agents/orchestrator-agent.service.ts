@@ -2,13 +2,14 @@ import { Injectable } from '@nestjs/common';
 import { Agent, run, handoff } from '@openai/agents';
 import { ITAgentService } from './it-agent.service';
 import { HRAgentService } from './hr-agent.service';
-
+import { sDKGuardrail } from 'src/guardrails/sdk-guardrails.service';
 @Injectable()
 export class OrchestratorService {
   private orchAgent: Agent;
   constructor(
     private hrAgent: HRAgentService,
     private itAgent: ITAgentService,
+    private inputGuard: sDKGuardrail,
   ) {
     this.orchestratorAgent();
   }
@@ -26,6 +27,7 @@ BEHAVIOR:
 - For greetings or unclear requests, default to HR Agent
 - Do NOT answer questions yourself - always route to a specialist`,
       handoffs: [this.hrAgent.hrAgent, this.itAgent.itAgent],
+      inputGuardrails: [this.inputGuard.inputGuardRail],
     });
   }
 
