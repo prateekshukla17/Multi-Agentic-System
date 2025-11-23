@@ -1,3 +1,3 @@
 ### Architecture
 
-![Architecture diagram](Arch_updated.png)
+![Architecture diagram](Final_Arch.png)
