@@ -1,10 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { Agent, run } from '@openai/agents';
 import { OpenAIProvider } from 'src/agents/openai.provider';
-import {
-  InputGuardrail,
-  InputGuardrailTripwireTriggered,
-} from '@openai/agents';
+import { InputGuardrail } from '@openai/agents';
 import { z } from 'zod';
 
 const GuardrailOutputSchema = z.object({
