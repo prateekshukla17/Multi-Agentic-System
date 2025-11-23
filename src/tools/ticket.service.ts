@@ -11,7 +11,7 @@ import { z } from 'zod';
 
 export const RaiseTicketSchema = z.object({
   employeeName: z.string().min(1, 'Employee name is required'),
-  Query: z.string().min(1, 'Query is required'),
+  query: z.string().min(1, 'query is required'),
 });
 
 export type raiseTicketInput = z.infer<typeof RaiseTicketSchema>;
@@ -33,11 +33,13 @@ export class RaiseTicketService {
 
       const ticket = new this.RaiseticketModel({
         employeeName: validateInput.employeeName,
-        query: validateInput.Query || '',
+        query: validateInput.query || '',
         status: TicketStatus.PENDING,
       });
 
       const savedTicket = await ticket.save();
+      console.log('Entry added to the database');
+
       return {
         success: true,
         message: 'Your ticket has been raised',

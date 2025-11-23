@@ -43,12 +43,12 @@ export class ToolsService {
           type: 'object',
           properties: {
             employeeName: {
-              type: 'String',
+              type: 'string',
               description:
                 'This is the name of the Employee Raising the ticket',
             },
             query: {
-              type: 'String',
+              type: 'string',
               description:
                 'This is the query of the employee for which they are raising the ticket',
             },

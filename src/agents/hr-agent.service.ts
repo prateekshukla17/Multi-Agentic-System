@@ -47,7 +47,7 @@ Guidelines:
     try {
       const result = await run(this.hrAgent, userMessage);
       const output = result.finalOutput || '';
-      return output;
+      return `[HR Agent]\n${output}`;
     } catch (error) {
       console.error('Error in HR agent:', error);
       return `Error!`;
