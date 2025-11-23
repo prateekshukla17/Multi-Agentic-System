@@ -3,7 +3,6 @@ import { RagService } from './rag.service';
 import { z } from 'zod';
 import { zodToJsonSchema } from 'zod-to-json-schema';
 import { LeaveToolService } from './leave-tool.service';
-import { object } from 'zod/v4';
 import type { AddLeaveInput } from './leave-tool.service';
 
 const leavePolicyQuerySchema = z.object({
@@ -63,7 +62,14 @@ export class ToolsService {
               description: 'Optional reason for the leave request',
             },
           },
-          required: ['employeeName', 'leaveType', 'startDate', 'endDate'],
+          required: [
+            'employeeName',
+            'leaveType',
+            'startDate',
+            'endDate',
+            'reason',
+          ],
+          additionalProperties: false,
         },
       },
       execute: async (input: AddLeaveInput) => {
@@ -103,7 +109,7 @@ Use this tool when employees ask about:
     switch (toolName) {
       case 'query_leave_policies':
         return await tools.queryLeavePolicies.execute(args);
-      case 'addLeaveRequest':
+      case 'add_leave_request':
         return await tools.addLeaveRequest.execute(args);
       default:
         throw new Error(`Unknown tool: ${toolName}`);

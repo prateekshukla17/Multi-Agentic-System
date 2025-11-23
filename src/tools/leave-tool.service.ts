@@ -15,7 +15,7 @@ export const AddLeaveSchema = z.object({
   leaveType: z.enum(['sick', 'vacation', 'personal', 'parental', 'unpaid']),
   startDate: z.string().describe('Format: YYYY-MM-DD'),
   endDate: z.string().describe('Format: YYYY-MM-DD'),
-  reason: z.string().optional(),
+  reason: z.string().min(1, 'Reason is required'),
 });
 
 type LeaveOutput = {

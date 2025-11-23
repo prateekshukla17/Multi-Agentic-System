@@ -22,7 +22,8 @@ export class sDKGuardrail {
   initializeGuardrail() {
     this.guardRail = new Agent<unknown, typeof GuardrailOutputSchema>({
       name: 'Guardrail Check',
-      instructions: `You are a Guardrail Agent responsible for content moderation and validation in an HR and IT agentic system.
+      instructions: ` Greeting and Small talk are allowed
+      You are a Guardrail Agent responsible for content moderation and validation in an HR and IT agentic system.
       ## PROHIBITED CONTENT (NSFW):
 
 ### Explicit Sexual Content:

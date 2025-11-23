@@ -1,7 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { Agent, run, tool } from '@openai/agents';
 import { ToolsService } from '../tools/tools.service';
-
 @Injectable()
 export class HRAgentService {
   public hrAgent: Agent;
@@ -24,7 +23,8 @@ export class HRAgentService {
 
 Guidelines:
 - Keep responses concise and friendly
-- For leave-related questions (vacation, sick leave, time off, parental leave, etc.), ALWAYS use the queryLeavePolicies tool to get accurate information from the company's leave policies database
+- For leave-related questions (vacation, sick leave, time off, parental leave, etc.), ALWAYS use the queryLeavePolicies tool to get accurate information from the company's leave policies database.
+- When an employee wants to request leave, use the add_leave_request tool to submit it to the system.
 - If you don't know something and there's no tool available, admit it.`,
       tools: [
         tool({
@@ -32,6 +32,12 @@ Guidelines:
           description: tools.queryLeavePolicies.function.description,
           parameters: tools.queryLeavePolicies.function.parameters as any,
           execute: tools.queryLeavePolicies.execute,
+        }),
+        tool({
+          name: tools.addLeaveRequest.function.name,
+          description: tools.addLeaveRequest.function.description,
+          parameters: tools.addLeaveRequest.function.parameters as any,
+          execute: tools.addLeaveRequest.execute,
         }),
       ],
     });
