@@ -10,11 +10,8 @@ import {
 import { z } from 'zod';
 
 export const RaiseTicketSchema = z.object({
-  ticketId: z.number(),
   employeeName: z.string().min(1, 'Employee name is required'),
-  raiseDate: z.string().describe('FORMATL YYYY-MM-DD'),
   Query: z.string().min(1, 'Query is required'),
-  Status: z.enum(['pending', 'resolved']),
 });
 
 export type raiseTicketInput = z.infer<typeof RaiseTicketSchema>;
@@ -35,9 +32,7 @@ export class RaiseTicketService {
       const validateInput = RaiseTicketSchema.parse(input);
 
       const ticket = new this.RaiseticketModel({
-        ticketId: 1,
         employeeName: validateInput.employeeName,
-        raiseDate: new Date(),
         query: validateInput.Query || '',
         status: TicketStatus.PENDING,
       });

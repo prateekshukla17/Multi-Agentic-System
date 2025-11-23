@@ -1,4 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import { UUID } from 'crypto';
 import { HydratedDocument } from 'mongoose';
 import tr from 'zod/v4/locales/tr.js';
 
@@ -12,11 +13,7 @@ export enum TicketStatus {
 @Schema({ timestamps: true })
 export class Ticket {
   @Prop({ required: true })
-  ticketId: Number;
-  @Prop({ required: true })
   employeeName: String;
-  @Prop({ required: true })
-  raiseDate: Date;
   @Prop({ required: true })
   query: String;
   @Prop({ required: true })

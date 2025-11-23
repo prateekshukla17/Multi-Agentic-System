@@ -4,7 +4,7 @@ import { z } from 'zod';
 import { zodToJsonSchema } from 'zod-to-json-schema';
 import { LeaveToolService } from './leave-tool.service';
 import type { AddLeaveInput } from './leave-tool.service';
-import { RaiseTicketService } from './ticket.service';
+import { RaiseTicketService, raiseTicketInput } from './ticket.service';
 
 const leavePolicyQuerySchema = z.object({
   question: z
@@ -29,9 +29,39 @@ export class ToolsService {
     return {
       queryLeavePolicies: this.getQueryLeavePolicyTool(),
       addLeaveRequest: this.getLeaveTool(),
+      raiseTicket: this.getTicketTool(),
     };
   }
-
+  private getTicketTool() {
+    return {
+      type: 'function' as const,
+      function: {
+        name: 'raise_ticket',
+        description:
+          'Raise a IT query ticket to the system. Use this when an employee wants to raise a ticket related to IT',
+        parameters: {
+          type: 'object',
+          properties: {
+            employeeName: {
+              type: 'String',
+              description:
+                'This is the name of the Employee Raising the ticket',
+            },
+            query: {
+              type: 'String',
+              description:
+                'This is the query of the employee for which they are raising the ticket',
+            },
+          },
+          required: ['employeeName', 'query'],
+          additionalProperties: false,
+        },
+      },
+      execute: async (input: raiseTicketInput) => {
+        return await this.ticketService.raiseTicket(input);
+      },
+    };
+  }
   private getLeaveTool() {
     return {
       type: 'function' as const,
@@ -113,6 +143,8 @@ Use this tool when employees ask about:
         return await tools.queryLeavePolicies.execute(args);
       case 'add_leave_request':
         return await tools.addLeaveRequest.execute(args);
+      case 'raise_ticket':
+        return await tools.raiseTicket.execute(args);
       default:
         throw new Error(`Unknown tool: ${toolName}`);
     }
