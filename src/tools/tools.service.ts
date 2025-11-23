@@ -4,6 +4,7 @@ import { z } from 'zod';
 import { zodToJsonSchema } from 'zod-to-json-schema';
 import { LeaveToolService } from './leave-tool.service';
 import type { AddLeaveInput } from './leave-tool.service';
+import { RaiseTicketService } from './ticket.service';
 
 const leavePolicyQuerySchema = z.object({
   question: z
@@ -21,6 +22,7 @@ export class ToolsService {
   constructor(
     private ragService: RagService,
     private leaveService: LeaveToolService,
+    private ticketService: RaiseTicketService,
   ) {}
 
   getTools() {
