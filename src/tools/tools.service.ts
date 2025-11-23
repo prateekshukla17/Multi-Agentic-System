@@ -2,6 +2,9 @@ import { Injectable } from '@nestjs/common';
 import { RagService } from './rag.service';
 import { z } from 'zod';
 import { zodToJsonSchema } from 'zod-to-json-schema';
+import { LeaveToolService } from './leave-tool.service';
+import { object } from 'zod/v4';
+import type { AddLeaveInput } from './leave-tool.service';
 
 const leavePolicyQuerySchema = z.object({
   question: z
@@ -16,11 +19,56 @@ const leavePolicyQuerySchema = z.object({
 
 @Injectable()
 export class ToolsService {
-  constructor(private ragService: RagService) {}
+  constructor(
+    private ragService: RagService,
+    private leaveService: LeaveToolService,
+  ) {}
 
   getTools() {
     return {
       queryLeavePolicies: this.getQueryLeavePolicyTool(),
+      addLeaveRequest: this.getLeaveTool(),
+    };
+  }
+
+  private getLeaveTool() {
+    return {
+      type: 'function' as const,
+      function: {
+        name: 'add_leave_request',
+        description:
+          'Add a new leave request to the system. Use this when an employee wants to apply for a leave.',
+        parameters: {
+          type: 'object',
+          properties: {
+            employeeName: {
+              type: 'string',
+              description: 'This is the name of the employee',
+            },
+            leaveType: {
+              type: 'string',
+              enum: ['sick', 'vacation', 'personal', 'unpaid'],
+              description: 'The type of leave being requested',
+            },
+            startDate: {
+              type: 'string',
+              description: 'Start date of leave in YYYY-MM-DD format',
+            },
+            endDate: {
+              type: 'string',
+              description: 'End date of leave in YYYY-MM-DD format',
+            },
+            reason: {
+              type: 'string',
+              description: 'Optional reason for the leave request',
+            },
+          },
+          required: ['employeeName', 'leaveType', 'startDate', 'endDate'],
+        },
+      },
+      execute: async (input: AddLeaveInput) => {
+        return await this.leaveService.addLeaveRequest(input);
+      },
     };
   }
 
@@ -35,7 +83,6 @@ Use this tool when employees ask about:
 - How many vacation days they get
 - Sick leave policies
 - Parental leave information
-- Leave request procedures
 - Holiday schedules
 - Any other leave related questions`,
         parameters: {
@@ -50,12 +97,14 @@ Use this tool when employees ask about:
     };
   }
 
-  async executeTool(toolName: string, args: any): Promise<string> {
+  async executeTool(toolName: string, args: any): Promise<any> {
     const tools = this.getTools();
 
     switch (toolName) {
       case 'query_leave_policies':
         return await tools.queryLeavePolicies.execute(args);
+      case 'addLeaveRequest':
+        return await tools.addLeaveRequest.execute(args);
       default:
         throw new Error(`Unknown tool: ${toolName}`);
     }
