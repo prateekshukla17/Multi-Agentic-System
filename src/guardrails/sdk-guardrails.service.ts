@@ -51,14 +51,6 @@ export class sDKGuardrail {
 - Political opinions or debates
 - Financial investment advice
 - Medical diagnoses or treatment advice
-
-### NOT IT-Related:
-- Non-technical general knowledge questions
-- Creative writing or storytelling
-- Academic homework help (unrelated to company systems)
-- Personal device troubleshooting (non-company equipment)
-- Gaming or entertainment technology
-
  `,
       outputType: GuardrailOutputSchema,
     });

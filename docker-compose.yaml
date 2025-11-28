@@ -1,0 +1,19 @@
+version: '3.8'
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: agentic-system-dev
+    ports:
+      - '30000:30000'
+    environment:
+      - MONGODB_URI=${MONGODB_URI}
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - QDRANT_URL=${QDRANT_URL}
+      - QDRANT_COLLECTION_NAME=${QDRANT_COLLECTION_NAME}
+      - QDRANT_API_KEY=${QDRANT_API_KEY}
+    volumes:
+      - .:/app
+      - /app/node_modules
+    restart: unless-stopped
