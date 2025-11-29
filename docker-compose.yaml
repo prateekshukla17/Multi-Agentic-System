@@ -5,6 +5,8 @@ services:
       context: .
       dockerfile: Dockerfile
     container_name: agentic-system-dev
+    stdin_open: true
+    tty: true
     ports:
       - '30000:30000'
     environment:

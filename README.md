@@ -35,6 +35,14 @@
    ```bash
    npm start
    ```
+6. **Run with Docker**
+
+```bash
+# Build and run the application
+docker-compose run --rm app
+```
+
+---
 
 ## Architecture Diagram
 
