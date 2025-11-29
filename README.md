@@ -46,4 +46,4 @@ docker-compose run --rm app
 
 ## Architecture Diagram
 
-![Architecture Diagram](Arch_updated.png)
+![Architecture Diagram](Arch_updated1.png)
