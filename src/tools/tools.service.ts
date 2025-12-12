@@ -5,6 +5,8 @@ import { zodToJsonSchema } from 'zod-to-json-schema';
 import { LeaveToolService } from './leave-tool.service';
 import type { AddLeaveInput } from './leave-tool.service';
 import { RaiseTicketService, raiseTicketInput } from './ticket.service';
+import { ImgToolService } from './imgTool.service';
+import { generate } from 'rxjs';
 
 const leavePolicyQuerySchema = z.object({
   question: z
@@ -17,12 +19,22 @@ const leavePolicyQuerySchema = z.object({
     .describe('Number of top results to return (default: 5)'),
 });
 
+const GenerateImageSchema = z.object({
+  prompt: z.string().describe('The description of the image to generate'),
+  size: z
+    .enum(['1024x1024', '1792x1024', '1024x1792'])
+    .optional()
+    .default('1024x1024'),
+  quality: z.enum(['standard', 'hd']).optional().default('standard'),
+});
+
 @Injectable()
 export class ToolsService {
   constructor(
     private ragService: RagService,
     private leaveService: LeaveToolService,
     private ticketService: RaiseTicketService,
+    private imgGenService: ImgToolService,
   ) {}
 
   getTools() {
@@ -30,6 +42,7 @@ export class ToolsService {
       queryLeavePolicies: this.getQueryLeavePolicyTool(),
       addLeaveRequest: this.getLeaveTool(),
       raiseTicket: this.getTicketTool(),
+      generateImg: this.getGenerateImageTool(),
     };
   }
   private getTicketTool() {
@@ -135,6 +148,41 @@ Use this tool when employees ask about:
     };
   }
 
+  private getGenerateImageTool() {
+    return {
+      type: 'function' as const,
+      function: {
+        name: 'generate_image',
+        description:
+          'Generate a new image from a text description using DALL-E 3',
+        parameters: {
+          type: 'object',
+          properties: {
+            prompt: {
+              type: 'string',
+              description: 'Detailed description of the image to generate',
+            },
+            size: {
+              type: 'string',
+              enum: ['1024x1024', '1792x1024', '1024x1792'],
+              description: 'Size of the generated image',
+            },
+            quality: {
+              type: 'string',
+              enum: ['standard', 'hd'],
+              description: 'Quality level: standard or hd',
+            },
+          },
+          required: ['prompt'],
+          additionalProperties: false,
+        },
+      },
+      execute: async (args: z.infer<typeof GenerateImageSchema>) => {
+        return await this.imgGenService.generateImage(args);
+      },
+    };
+  }
+
   async executeTool(toolName: string, args: any): Promise<any> {
     const tools = this.getTools();
 
@@ -145,6 +193,8 @@ Use this tool when employees ask about:
         return await tools.addLeaveRequest.execute(args);
       case 'raise_ticket':
         return await tools.raiseTicket.execute(args);
+      case 'generate_image':
+        return await tools.generateImg.execute(args);
       default:
         throw new Error(`Unknown tool: ${toolName}`);
     }
