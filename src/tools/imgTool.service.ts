@@ -40,8 +40,8 @@ export class ImgToolService {
         model: 'dall-e-3',
         prompt: input.prompt,
         n: 1,
-        size: input.size || '1024x1024',
-        quality: input.quality || 'standard',
+        size: '1024x1024',
+        quality: 'standard',
         response_format: 'url',
       });
 

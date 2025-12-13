@@ -24,7 +24,29 @@ export class ImageGenService {
 Guidelines:
 - Always use the generateImage tool to fulfill image requests.
 - If you don't know something and there's no tool available, admit it.`,
-      tools: [],
+      tools: [
+        tool({
+          name: tools.generateImg.function.name,
+          description: tools.generateImg.function.description,
+          parameters: tools.generateImg.function.parameters as any,
+          execute: tools.generateImg.execute,
+        }),
+      ],
     });
+  }
+  async processMessage(userMessage: string): Promise<string> {
+    try {
+      console.log('Image Generator Agent processing:', userMessage);
+
+      const result = await run(this.imageAgent, userMessage);
+      const output = result.finalOutput || '';
+
+      console.log('Image generation completed');
+
+      return `[Image Generator]\n${output}`;
+    } catch (error) {
+      console.error('Error in Image Generator agent:', error);
+      return `Error generating image: ${error.message}`;
+    }
   }
 }

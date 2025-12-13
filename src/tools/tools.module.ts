@@ -8,6 +8,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { Leave, LeaveSchema } from '../database/schemas/leave.schema';
 import { Ticket, TicketSchema } from 'src/database/schemas/ticket.schema';
 import { RaiseTicketService } from './ticket.service';
+import { ImgToolService } from './imgTool.service';
 @Module({
   imports: [
     ConfigModule,
@@ -23,7 +24,14 @@ import { RaiseTicketService } from './ticket.service';
     DatabaseModule,
     LeaveToolService,
     RaiseTicketService,
+    ImgToolService,
   ],
-  exports: [ToolsService, RagService, LeaveToolService, RaiseTicketService],
+  exports: [
+    ToolsService,
+    RagService,
+    LeaveToolService,
+    RaiseTicketService,
+    ImgToolService,
+  ],
 })
 export class ToolsModule {}

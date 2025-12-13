@@ -6,6 +6,7 @@ import { OpenAIProvider } from './openai.provider';
 import { GuardrailsModule } from '../guardrails/guardrails.module';
 import { ToolsModule } from '../tools/tools.module';
 import { OrchestratorService } from './orchestrator-agent.service';
+import { ImageGenService } from './image-gen.service';
 
 @Module({
   imports: [GuardrailsModule, ToolsModule],
@@ -15,6 +16,7 @@ import { OrchestratorService } from './orchestrator-agent.service';
     HRAgentService,
     ITAgentService,
     OrchestratorService,
+    ImageGenService,
   ],
   exports: [AgentOrchestrtor],
 })

@@ -6,7 +6,6 @@ import { LeaveToolService } from './leave-tool.service';
 import type { AddLeaveInput } from './leave-tool.service';
 import { RaiseTicketService, raiseTicketInput } from './ticket.service';
 import { ImgToolService } from './imgTool.service';
-import { generate } from 'rxjs';
 
 const leavePolicyQuerySchema = z.object({
   question: z
