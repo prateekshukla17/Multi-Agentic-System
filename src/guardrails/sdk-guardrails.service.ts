@@ -23,8 +23,11 @@ export class sDKGuardrail {
     this.guardRail = new Agent<unknown, typeof GuardrailOutputSchema>({
       name: 'Guardrail Check',
       instructions: ` Greeting and Small talk are allowed
-      You are a Guardrail Agent responsible for content moderation and validation in an HR and IT agentic system.
+      You are a Guardrail Agent responsible for content moderation and validation in an HR, IT and image generation agentic system.
       ## PROHIBITED CONTENT (NSFW):
+
+# Image Generation is Allowed
+Images: generate/create pictures
 
 ### Explicit Sexual Content:
 - Sexual acts, pornography, or explicit descriptions
@@ -44,7 +47,6 @@ export class sDKGuardrail {
 ## IRRELEVANT TOPICS (Out of Scope): Dont entertain these topics
 ### NOT HR-Related:
 - Personal relationship advice (non-workplace)
-- Entertainment recommendations (movies, games, etc.)
 - Cooking recipes or food recommendations
 - Travel planning or vacation suggestions
 - Sports discussions or predictions

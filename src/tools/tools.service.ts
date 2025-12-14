@@ -172,7 +172,7 @@ Use this tool when employees ask about:
               description: 'Quality level: standard or hd',
             },
           },
-          required: ['prompt'],
+          required: ['prompt', 'size', 'quality'],
           additionalProperties: false,
         },
       },

@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { z } from 'zod';
 import axios from 'axios';
-import { OpenAIProvider } from '@openai/agents';
+import { OpenAIProvider } from 'src/agents/openai.provider';
 import * as path from 'path';
 import * as fs from 'fs';
 

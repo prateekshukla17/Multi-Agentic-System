@@ -9,6 +9,7 @@ import { Leave, LeaveSchema } from '../database/schemas/leave.schema';
 import { Ticket, TicketSchema } from 'src/database/schemas/ticket.schema';
 import { RaiseTicketService } from './ticket.service';
 import { ImgToolService } from './imgTool.service';
+import { OpenAIProvider } from 'src/agents/openai.provider';
 @Module({
   imports: [
     ConfigModule,
@@ -25,6 +26,7 @@ import { ImgToolService } from './imgTool.service';
     LeaveToolService,
     RaiseTicketService,
     ImgToolService,
+    OpenAIProvider,
   ],
   exports: [
     ToolsService,

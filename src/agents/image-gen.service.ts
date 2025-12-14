@@ -1,7 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { Agent, run, tool } from '@openai/agents';
 import { ToolsService } from '../tools/tools.service';
-import axios from 'axios';
 
 @Injectable()
 export class ImageGenService {

@@ -3,6 +3,7 @@ import { Agent, run, handoff } from '@openai/agents';
 import { ITAgentService } from './it-agent.service';
 import { HRAgentService } from './hr-agent.service';
 import { sDKGuardrail } from 'src/guardrails/sdk-guardrails.service';
+import { ImageGenService } from './image-gen.service';
 @Injectable()
 export class OrchestratorService {
   private orchAgent: Agent;
@@ -10,6 +11,7 @@ export class OrchestratorService {
     private hrAgent: HRAgentService,
     private itAgent: ITAgentService,
     private inputGuard: sDKGuardrail,
+    private imgGen: ImageGenService,
   ) {
     this.orchestratorAgent();
   }
@@ -21,12 +23,17 @@ export class OrchestratorService {
 ROUTING RULES:
 → HR Agent: Warm Talk, professional small talk, policies, benefits, PTO/leave, payroll, onboarding, workplace issues, general work chat
 → IT Agent: passwords, software, hardware, network/VPN, system access, technical issues
+→ Image Generator: image generation, creating pictures, making visuals, "generate image", "create picture", design requests
 
 BEHAVIOR:
 - Analyze the user's message and immediately hand off to the correct specialist
 - For greetings or unclear requests, default to HR Agent
 - Do NOT answer questions yourself - always route to a specialist`,
-      handoffs: [this.hrAgent.hrAgent, this.itAgent.itAgent],
+      handoffs: [
+        this.hrAgent.hrAgent,
+        this.itAgent.itAgent,
+        this.imgGen.imageAgent,
+      ],
       inputGuardrails: [this.inputGuard.inputGuardRail],
     });
   }
