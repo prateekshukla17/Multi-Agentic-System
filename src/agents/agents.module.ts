@@ -7,7 +7,7 @@ import { GuardrailsModule } from '../guardrails/guardrails.module';
 import { ToolsModule } from '../tools/tools.module';
 import { OrchestratorService } from './orchestrator-agent.service';
 import { ImageGenService } from './image-gen.service';
-
+import { ChatGateway } from './chat.gateway';
 @Module({
   imports: [GuardrailsModule, ToolsModule],
   providers: [
@@ -17,7 +17,8 @@ import { ImageGenService } from './image-gen.service';
     ITAgentService,
     OrchestratorService,
     ImageGenService,
+    ChatGateway,
   ],
-  exports: [AgentOrchestrtor],
+  exports: [AgentOrchestrtor, OpenAIProvider],
 })
 export class AgentModule {}
