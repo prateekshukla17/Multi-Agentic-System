@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { Agent, run, handoff } from '@openai/agents';
+import { Agent, run, handoff, user } from '@openai/agents';
 import { ITAgentService } from './it-agent.service';
 import { HRAgentService } from './hr-agent.service';
 import { sDKGuardrail } from 'src/guardrails/sdk-guardrails.service';
@@ -36,6 +36,18 @@ BEHAVIOR:
       ],
       inputGuardrails: [this.inputGuard.inputGuardRail],
     });
+  }
+
+  async procesStreamedOrcMessage(userMessage: string): Promise<any> {
+    try {
+      const streamedResult = await run(this.orchAgent, userMessage, {
+        stream: true,
+      });
+      return streamedResult;
+    } catch (error) {
+      console.error(`Error in response`, error);
+      return `Error`;
+    }
   }
 
   async processOrcMessage(userMessage: string): Promise<string> {

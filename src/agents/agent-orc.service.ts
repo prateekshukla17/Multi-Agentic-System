@@ -28,6 +28,21 @@ export class AgentOrchestrtor {
     });
   }
 
+  private async normalResponse(input: string) {
+    const response = await this.orchestratorAgent.processOrcMessage(input);
+    console.log(`\n assistant:${response}\n`);
+  }
+  private async steamedResponse(input: string) {
+    const response =
+      await this.orchestratorAgent.procesStreamedOrcMessage(input);
+    console.log('\n assistant: ', '');
+    response
+      .toTextStream({
+        compatibleWithNodeStreams: true,
+      })
+      .pipe(process.stdout);
+  }
+
   private async handleUserInput(input: string) {
     if (input.toLowerCase() === 'exit' || input.toLowerCase() === 'quit') {
       console.log('\n Exiting!');
@@ -44,8 +59,7 @@ export class AgentOrchestrtor {
       //   return;
       // }
 
-      const response = await this.orchestratorAgent.processOrcMessage(input);
-      console.log(`\n assistant: ${response}\n`);
+      this.normalResponse(input);
 
       // const outputCheck = await this.guardRails.checkOutput(response || '');
       // if (!outputCheck.passed) {
