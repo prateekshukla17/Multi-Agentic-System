@@ -49,7 +49,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
         },
       );
 
-      // Signal completion
       client.emit('stream_complete');
       console.log(`Stream complete for ${client.id}`);
     } catch (error) {
