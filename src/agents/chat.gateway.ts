@@ -24,11 +24,11 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   constructor(private readonly orchestratorService: OrchestratorService) {}
 
   handleConnection(client: Socket) {
-    console.log(`Conneted:${client.id}`);
+    console.log(`Client connected: ${client.id}`);
   }
 
   handleDisconnect(client: Socket) {
-    console.log(`Disconnected:${client.id}`);
+    console.log(`Client disconnected: ${client.id}`);
   }
 
   @SubscribeMessage('send_message')
@@ -37,38 +37,28 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     @ConnectedSocket() client: Socket,
   ) {
     try {
-      console.log(`Message recieved from ${client.id}`);
-      client.emit(`Status`, `Processing your request...`);
-      const response = await this.orchestratorService.processOrcMessage(
+      console.log(`Message from ${client.id}: ${data.message}`);
+
+      await this.orchestratorService.processOrcMessageStream(
         data.message,
+        (chunk: string) => {
+          client.emit('message_chunk', { chunk });
+        },
+        (agent: string) => {
+          client.emit('agent_detected', { agent });
+        },
       );
-      const imagePathMatch = response.match(
-        /generated_images[\/\\][\w-]+\.png/,
-      );
-      const imageUrl = imagePathMatch ? `/${imagePathMatch[0]}` : undefined;
-      let agent: string | undefined;
-      if (response.includes('[HR Agent]')) {
-        agent = 'HR Assistant';
-      } else if (response.includes('[IT Agent]')) {
-        agent = 'IT Assistant';
-      } else if (response.includes('[Image Generator]') || imageUrl) {
-        agent = 'Image-Generator';
-      }
-      client.emit('receive_message', {
-        content: response.replace(
-          /\[(HR Agent|IT Agent|Image Generator)\]\n?/g,
-          '',
-        ),
-        agent,
-        imageUrl,
-      });
-      console.log(`Response sent to ${client.id}`);
+
+      // Signal completion
+      client.emit('stream_complete');
+      console.log(`Stream complete for ${client.id}`);
     } catch (error) {
-      console.error(`Error processing image:${error}`);
+      console.error(`Error processing message:`, error);
+
       if (error instanceof InputGuardrailTripwireTriggered) {
         const guardRailInfo = error.result.output.outputInfo;
         client.emit('guardrail_blocked', {
-          message: 'Im sorry, I cant help with that',
+          message: "I'm sorry, I can't help with that.",
           reasoning: guardRailInfo.reasoning,
         });
       } else {

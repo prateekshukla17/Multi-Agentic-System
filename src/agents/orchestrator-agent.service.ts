@@ -1,9 +1,11 @@
 import { Injectable } from '@nestjs/common';
-import { Agent, run, handoff } from '@openai/agents';
+import { Agent, run, handoff, user } from '@openai/agents';
 import { ITAgentService } from './it-agent.service';
 import { HRAgentService } from './hr-agent.service';
 import { sDKGuardrail } from 'src/guardrails/sdk-guardrails.service';
 import { ImageGenService } from './image-gen.service';
+type ChunkCallback = (chunk: string) => void;
+type AgentCallback = (agent: string) => void;
 @Injectable()
 export class OrchestratorService {
   private orchAgent: Agent;
@@ -36,6 +38,80 @@ BEHAVIOR:
       ],
       inputGuardrails: [this.inputGuard.inputGuardRail],
     });
+  }
+  async processOrcMessageStream(
+    userMessage: string,
+    chunkCallback?: ChunkCallback,
+    agentCallback?: AgentCallback,
+  ): Promise<void> {
+    try {
+      console.log('Orchestrator processing:', userMessage);
+
+      const stream = await run(this.orchAgent, userMessage, {
+        stream: true,
+      });
+
+      let detectedAgent: string | undefined;
+      let fullText = '';
+
+      for await (const event of stream as AsyncIterable<any>) {
+        if (event.type === 'agent_updated_stream_event' && event.agent?.name) {
+          detectedAgent = event.agent.name;
+          if (detectedAgent !== undefined) {
+            agentCallback?.(detectedAgent);
+            console.log(`Agent: ${detectedAgent}`);
+          }
+        }
+
+        if (event.type === 'raw_model_stream_event') {
+          const delta = event.delta || event.snapshot;
+
+          if (delta?.choices?.[0]?.delta?.content) {
+            const textChunk = delta.choices[0].delta.content;
+            chunkCallback?.(textChunk);
+            fullText += textChunk;
+          }
+        }
+
+        if (event.type === 'run_item_stream_event') {
+          if (event.item?.content) {
+            const content = event.item.content;
+            if (typeof content === 'string') {
+              chunkCallback?.(content);
+              fullText += content;
+            } else if (Array.isArray(content)) {
+              await Promise.all(
+                content.map(async (block) => {
+                  if (block.type === 'text' && block.text) {
+                    chunkCallback?.(block.text);
+                    fullText += block.text;
+                  }
+                }),
+              );
+            }
+          }
+
+          if (
+            event.item?.type === 'function_call_output' &&
+            event.item.output
+          ) {
+            const output = JSON.parse(event.item.output);
+            if (output.imagePath) {
+              const imageUrl = `/${output.imagePath.replace(/\\/g, '/')}`;
+              chunkCallback?.(`[IMAGE:${imageUrl}]`);
+            }
+          }
+        }
+      }
+
+      await stream.completed;
+
+      console.log('Stream completed');
+      console.log('Total text streamed:', fullText.length, 'chars');
+    } catch (error) {
+      console.error(`Streaming error:`, error);
+      throw error;
+    }
   }
 
   async processOrcMessage(userMessage: string): Promise<string> {
